@@ -1,5 +1,7 @@
+import uuid
 from typing import Any, AsyncGenerator
 
+import pytest
 import pytest_asyncio
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
@@ -47,3 +49,13 @@ async def client(
         transport=ASGITransport(app=app), base_url="http://127.0.0.1"
     ) as client:
         yield client
+
+
+@pytest.fixture(scope="function")
+def prompt_payload():
+    payload = {
+        "text": uuid.uuid4().hex,
+        "variables": {uuid.uuid4().hex: uuid.uuid4().hex},
+        "created_by": uuid.uuid4().hex,
+    }
+    return payload
