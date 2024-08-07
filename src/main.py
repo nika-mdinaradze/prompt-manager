@@ -1,4 +1,7 @@
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +11,19 @@ from src.db import get_db
 app = FastAPI(
     title="prompt management API", description="Technical Assignment", version="0.0.0"
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    detail = [
+        {"location": error["loc"], "message": error["msg"]} for error in exc.errors()
+    ]
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=jsonable_encoder({"detail": detail}),
+    )
 
 
 @app.post("/prompts/", response_model=schemas.PromptView)
