@@ -1,0 +1,25 @@
+FROM python:3.11.5-slim-bullseye
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK true
+ENV PYTHONDONTWRITEBYTECODE true
+ENV PYTHONUNBUFFERED true
+
+WORKDIR /code
+
+COPY ./requirements/requirements.prod.txt .
+
+RUN pip install --upgrade pip
+RUN pip install -r requirements.prod.txt
+
+COPY . /code
+EXPOSE 80
+
+RUN useradd -ms /bin/bash my-user
+RUN chown -R my-user:my-user /code
+
+ADD scripts/docker-entrypoint-prod.sh /home/my-user/docker-entrypoint-prod.sh
+
+RUN chmod +x /home/my-user/docker-entrypoint-prod.sh
+USER my-user
+
+ENTRYPOINT ["/home/my-user/docker-entrypoint-prod.sh"]

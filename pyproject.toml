@@ -1,0 +1,11 @@
+[tool.black]
+line-length = 90
+target-version = ['py37', 'py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "--cov=src tests/"

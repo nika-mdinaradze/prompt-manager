@@ -1,0 +1,21 @@
+FROM python:3.11.5-slim-bullseye
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK true
+ENV PYTHONDONTWRITEBYTECODE true
+ENV PYTHONUNBUFFERED true
+
+WORKDIR /code
+
+COPY ./requirements/requirements.prod.txt .
+COPY ./requirements/requirements.dev.txt .
+
+RUN pip install --upgrade pip
+RUN pip install -r requirements.dev.txt
+
+COPY . /code
+
+ADD ./scripts/docker-entrypoint-dev.sh /root/docker-entrypoint-dev.sh
+
+RUN chmod +x /root/docker-entrypoint-dev.sh
+
+ENTRYPOINT ["/root/docker-entrypoint-dev.sh"]
